@@ -1,5 +1,5 @@
 from tkinter import Tk, BOTH, Canvas
-
+import time
 class Window():
     def __init__(self, width, height):
         self.__root = Tk()
@@ -12,11 +12,13 @@ class Window():
     def redraw(self):
         self.__root.update_idletasks()
         self.__root.update()
+        time.sleep(0.001)
     
     def wait_for_close(self):
         self.__win_running = True
         while self.__win_running:
             self.redraw()
+            
         print('window closed')
 
     def close(self):
@@ -99,3 +101,49 @@ class Cell():
         else:
             self._win.draw_line(line,"grey")
         
+class Maze():
+    def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win):
+        self.x1 = x1
+        self.y1 = y1
+        self.num_rows = num_rows
+        self.num_cols = num_cols
+        self.cell_size_x = cell_size_x
+        self.cell_size_y = cell_size_y
+        self.win = win
+        self._cells = []
+        self._create_cells()
+        self._draw_cells()
+
+    def _create_cells(self):
+        #self.num_cols determines how many Cells are needed in a list
+        #self.num_rows determines how many lists of Cells are needed
+        #need math for cell gen
+        #x1, y1 will represent top-left corner of the maze, hence the first cell as well
+        px1 = self.x1
+        py1 = self.y1
+        px2 = self.x1 + self.cell_size_x 
+        py2 = self.x1 + self.cell_size_y
+        for i in range(self.num_rows):
+            self._cells.append([])
+            for j in range(self.num_cols):
+                self._cells[i].append(Cell(px1,py1,px2,py2,self.win))
+                px1 += self.cell_size_x
+                px2 += self.cell_size_x
+            #check if this was the last row, if yes, don't need to update cell coordinates
+            #if i+1 != self.num_rows:
+                #after row is completed, need to reset x values for next row
+            px1 = self.x1
+            px2 = self.x1 + self.cell_size_x
+            #need to adjust y values for next row
+            py1 += self.cell_size_y
+            py2 += self.cell_size_y
+    
+
+    def _draw_cells(self):
+        for i in range(self.num_rows):
+            for cell in self._cells[i]:
+                self.win.draw_cell(cell, "black")
+                self._animate()
+                
+    def _animate(self):
+        self.win.redraw()

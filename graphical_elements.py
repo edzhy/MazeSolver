@@ -21,5 +21,22 @@ class Window():
 
     def close(self):
         self.__win_running = False
+
+    def draw_line(self, line, fill_color):
+        line.draw(self.canva,fill_color)
+
     
+class Point():
+    def __init__(self,x=0,y=0):
+        self.x=x
+        self.y=y
+    
+class Line():
+    def __init__(self,point1, point2):
+        self.l_start = point1
+        self.l_end = point2
+
+    def draw(self, canvas, fill_color):
+        #fill_color will be a string, ex.: "red"
+        canvas.create_line(self.l_start.x,self.l_start.y,self.l_end.x,self.l_end.y, fill=fill_color, width=2)
 

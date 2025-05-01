@@ -28,6 +28,8 @@ class Window():
     def draw_cell(self, cell, fill_color):
        cell.draw(fill_color)
 
+    def draw_cell_move(self, current_cell, to_cell, undo=False):
+        current_cell.draw_move(to_cell, undo)
     
 class Point():
     def __init__(self,x=0,y=0):
@@ -64,11 +66,11 @@ class Cell():
         #bottom-left p4 corner x as x1, y as y2
         p3, p4 = Point(self._x2, self._y1), Point(self._x1, self._y2)
         #
-        #   p1        p3
+        #   p1              p3
         #
-        #       cell
+        #       cell center
         #
-        #   p4        p2
+        #   p4              p2
         #
         #topwall rightwall bottomwall leftwall creation
         tw, rw, bw, lw = Line(p1,p3),Line(p3,p2),Line(p2,p4),Line(p1,p4)
@@ -80,3 +82,20 @@ class Cell():
             self._win.draw_line(bw,fill_color)
         if self.has_left_wall:
             self._win.draw_line(lw,fill_color)
+
+    def draw_move(self, to_cell, undo=False):
+        #cell center math
+        cc_x = (self._x1 + self._x2)/2
+        cc_y = (self._y1 + self._y2)/2
+        cc = Point(cc_x, cc_y)
+
+        to_cc_x = (to_cell._x1 + to_cell._x2)/2
+        to_cc_y = (to_cell._y1 + to_cell._y2)/2
+        to_cc = Point(to_cc_x, to_cc_y)
+
+        line = Line(cc, to_cc)
+        if not undo:
+            self._win.draw_line(line,"red")
+        else:
+            self._win.draw_line(line,"grey")
+        

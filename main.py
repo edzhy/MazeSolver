@@ -13,6 +13,12 @@ def main():
     win.draw_cell(cell1, "red")
     cell2 = Cell(490,490,410,410,win,rw=False)
     win.draw_cell(cell2, "black")
+    cell3 = Cell(100,500,200,400,win)
+    win.draw_cell(cell3, "red")
+    cell4 = Cell(400,100,300,200,win)
+    win.draw_cell(cell4, "black")
+    win.draw_cell_move(cell1, cell3)
+    win.draw_cell_move(cell4, cell3, True)
     win.wait_for_close()
 
 main()

@@ -28,7 +28,16 @@ class Tests(unittest.TestCase):
         self.assertEqual(maze._cells[row_index][col_index]._y2,
                          y_expected_size)
 
-
+    def test_breaking_entrance_exit(self):
+        num_rows, num_cols = 30, 30
+        x_cell_size, y_cell_size = 25, 30
+        maze = Maze(10,10,num_rows,num_cols,x_cell_size,y_cell_size)
+        row_index, col_index = num_rows-1, num_cols-1
+        maze._break_entrance_and_exit()
+        self.assertEqual(maze._cells[0][0].has_left_wall,
+                         False)
+        self.assertEqual(maze._cells[row_index][col_index].has_right_wall,
+                         False)
 
 if __name__ == "__main__":
     unittest.main()

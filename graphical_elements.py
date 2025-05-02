@@ -169,6 +169,8 @@ class Maze():
         entrance_cell = self._cells[0][0]
         exit_cell = self._cells[exit_index_row][exit_index_col]
         entrance_cell.has_left_wall = False
-        self.win.draw_cell(entrance_cell, fill_color, True)
+        if self.win is not None:
+            self.win.draw_cell(entrance_cell, fill_color, True)
         exit_cell.has_right_wall = False
-        self.win.draw_cell(exit_cell, fill_color, True)
+        if self.win is not None:
+            self.win.draw_cell(exit_cell, fill_color, True)

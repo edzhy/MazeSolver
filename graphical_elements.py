@@ -12,7 +12,7 @@ class Window():
     def redraw(self):
         self.__root.update_idletasks()
         self.__root.update()
-        time.sleep(0.001)
+        time.sleep(0.025)
     
     def wait_for_close(self):
         self.__win_running = True
@@ -27,8 +27,8 @@ class Window():
     def draw_line(self, line, fill_color):
         line.draw(self.canva, fill_color)
 
-    def draw_cell(self, cell, fill_color):
-       cell.draw(fill_color)
+    def draw_cell(self, cell, fill_color, breaking_w=False):
+       cell.draw(fill_color,breaking_w)
 
     def draw_cell_move(self, current_cell, to_cell, undo=False):
         current_cell.draw_move(to_cell, undo)
@@ -61,7 +61,7 @@ class Cell():
         self._y2 = y2
         self._win = win
     
-    def draw(self, fill_color):
+    def draw(self, fill_color, breaking_w=False):
         p1, p2 = Point(self._x1, self._y1), Point(self._x2, self._y2)
         #opposite corner creation math
         #top-right p3 corner will have x as x2, y as y1,
@@ -76,14 +76,25 @@ class Cell():
         #
         #topwall rightwall bottomwall leftwall creation
         tw, rw, bw, lw = Line(p1,p3),Line(p3,p2),Line(p2,p4),Line(p1,p4)
-        if self.has_top_wall:
-            self._win.draw_line(tw,fill_color)
-        if self.has_right_wall:
-            self._win.draw_line(rw,fill_color)
-        if self.has_bottom_wall:
-            self._win.draw_line(bw,fill_color)
-        if self.has_left_wall:
-            self._win.draw_line(lw,fill_color)
+        if not breaking_w:
+            if self.has_top_wall:
+                self._win.draw_line(tw,fill_color)
+            if self.has_right_wall:
+                self._win.draw_line(rw,fill_color)
+            if self.has_bottom_wall:
+                self._win.draw_line(bw,fill_color)
+            if self.has_left_wall:
+                self._win.draw_line(lw,fill_color)
+        else:
+            if not self.has_top_wall:
+                self._win.draw_line(tw,fill_color)
+            if not self.has_right_wall:
+                self._win.draw_line(rw,fill_color)
+            if not self.has_bottom_wall:
+                self._win.draw_line(bw,fill_color)
+            if not self.has_left_wall:
+                self._win.draw_line(lw,fill_color)
+        
 
     def draw_move(self, to_cell, undo=False):
         #cell center math
@@ -149,3 +160,15 @@ class Maze():
                 
     def _animate(self):
         self.win.redraw()
+
+    def _break_entrance_and_exit(self, fill_color="white"):
+        exit_index_col = self.num_cols - 1
+        exit_index_row = self.num_rows - 1
+        #need to break top left cells left wall-Line( Point(self._cells._x1, self._y1), Point(self._x1, self._y2) )
+        #and bottom right cells right wall-Line( Point(self._x2, self._y1), Point(self._x2, self._y2) )
+        entrance_cell = self._cells[0][0]
+        exit_cell = self._cells[exit_index_row][exit_index_col]
+        entrance_cell.has_left_wall = False
+        self.win.draw_cell(entrance_cell, fill_color, True)
+        exit_cell.has_right_wall = False
+        self.win.draw_cell(exit_cell, fill_color, True)

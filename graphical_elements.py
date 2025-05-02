@@ -48,7 +48,7 @@ class Line():
         canvas.create_line(self.l_start.x,self.l_start.y,self.l_end.x,self.l_end.y, fill=fill_color, width=2)
 
 class Cell():
-    def __init__(self, x1, y1, x2, y2, win, lw=True, rw=True, tw=True, bw=True):
+    def __init__(self, x1, y1, x2, y2, win=None, lw=True, rw=True, tw=True, bw=True):
         self.has_left_wall = lw
         self.has_right_wall = rw
         self.has_top_wall = tw
@@ -102,7 +102,7 @@ class Cell():
             self._win.draw_line(line,"grey")
         
 class Maze():
-    def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win):
+    def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win=None):
         self.x1 = x1
         self.y1 = y1
         self.num_rows = num_rows
@@ -140,6 +140,8 @@ class Maze():
     
 
     def _draw_cells(self):
+        if self.win is None:
+            return
         for i in range(self.num_rows):
             for cell in self._cells[i]:
                 self.win.draw_cell(cell, "black")

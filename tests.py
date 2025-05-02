@@ -1,6 +1,6 @@
 import unittest
 from graphical_elements import *
-
+import random
 class Tests(unittest.TestCase):
     def test_maze_create_cells(self):
         num_rows = 12
@@ -33,11 +33,22 @@ class Tests(unittest.TestCase):
         x_cell_size, y_cell_size = 25, 30
         maze = Maze(10,10,num_rows,num_cols,x_cell_size,y_cell_size)
         row_index, col_index = num_rows-1, num_cols-1
-        maze._break_entrance_and_exit()
+
         self.assertEqual(maze._cells[0][0].has_left_wall,
                          False)
         self.assertEqual(maze._cells[row_index][col_index].has_right_wall,
                          False)
+
+    def test_visited(self):
+        num_rows, num_cols = 30, 30
+        x_cell_size, y_cell_size = 25, 30
+        maze = Maze(10,10,num_rows,num_cols,x_cell_size,y_cell_size)
+        row_index, col_index = random.randrange(0,num_rows-1), random.randrange(0,num_cols-1)
+
+        self.assertEqual(maze._cells[row_index][col_index]._visited,
+                         False)
+
+        
 
 if __name__ == "__main__":
     unittest.main()

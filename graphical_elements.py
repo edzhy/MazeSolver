@@ -1,5 +1,6 @@
 from tkinter import Tk, BOTH, Canvas
 import time
+import random
 class Window():
     def __init__(self, width, height):
         self.__root = Tk()
@@ -60,6 +61,7 @@ class Cell():
         self._x2 = x2
         self._y2 = y2
         self._win = win
+        self._visited = False
     
     def draw(self, fill_color, breaking_w=False):
         p1, p2 = Point(self._x1, self._y1), Point(self._x2, self._y2)
@@ -111,9 +113,43 @@ class Cell():
             self._win.draw_line(line,"red")
         else:
             self._win.draw_line(line,"grey")
+    
+    def _break_wall(self, direction, chosen_cell):
+        #self
+        p1, p2 = Point(self._x1, self._y1), Point(self._x2, self._y2)
+        p3, p4 = Point(self._x2, self._y1), Point(self._x1, self._y2)
+        tw, rw, bw, lw = Line(p1,p3),Line(p3,p2),Line(p2,p4),Line(p1,p4)
+        #chosen cell
+        #ccp1, ccp2 = Point(chosen_cell._x1, chosen_cell._y1), Point(chosen_cell._x2, chosen_cell._y2)
+        #ccp3, ccp4 = Point(chosen_cell._x2, chosen_cell._y1), Point(chosen_cell._x1, chosen_cell._y2)
+        #cctw, ccrw, ccbw, cclw = Line(ccp1,ccp3),Line(ccp3,ccp2),Line(ccp2,ccp4),Line(ccp1,ccp4)
+        match direction:
+            case "top":
+                self.has_top_wall = False
+                chosen_cell.has_bottom_wall = False
+            case "bot":
+                chosen_cell.has_top_wall = False
+                self.has_bottom_wall = False
+            case "lw":
+                self.has_left_wall = False
+                chosen_cell.has_right_wall = False
+            case "rw":
+                chosen_cell.has_left_wall = False
+                self.has_right_wall = False
+        if self._win is not None:
+            if direction == "top":
+                self._win.draw_line(tw,"white")
+            elif direction == "bot":
+                self._win.draw_line(bw,"white")
+            elif direction == "rw":
+                self._win.draw_line(rw,"white")
+            elif direction == "lw":
+                self._win.draw_line(lw,"white")
+        else:
+            return
         
 class Maze():
-    def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win=None):
+    def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win=None, seed=None):
         self.x1 = x1
         self.y1 = y1
         self.num_rows = num_rows
@@ -122,8 +158,15 @@ class Maze():
         self.cell_size_y = cell_size_y
         self.win = win
         self._cells = []
+        #seed allows to reproduce the exact same maze layout
+        if seed:
+            random.seed(seed)
         self._create_cells()
         self._draw_cells()
+
+        self._break_entrance_and_exit()
+        self._break_walls_r(0,0)
+        self._reset_cells_visited()
 
     def _create_cells(self):
         #self.num_cols determines how many Cells are needed in a list
@@ -174,3 +217,44 @@ class Maze():
         exit_cell.has_right_wall = False
         if self.win is not None:
             self.win.draw_cell(exit_cell, fill_color, True)
+
+    def _break_walls_r(self, i, j):
+        current_cell = self._cells[i][j]
+        current_cell._visited = True
+        while True:
+            to_visit = []
+            #checking current cells adjacent cells for visitation status
+            #checking to the left
+            if j > 0:
+                if not self._cells[i][j-1]._visited:
+                    to_visit.append([i,j-1,'lw'])
+            #checking to the right
+            if j < self.num_cols - 1:
+                if not self._cells[i][j+1]._visited:
+                    to_visit.append([i,j+1,'rw'])
+            #checking up
+            if i > 0:
+                if not self._cells[i-1][j]._visited:
+                    to_visit.append([i-1,j,'top'])
+            #checking down
+            if i < self.num_rows - 1:
+                if not self._cells[i+1][j]._visited:
+                    to_visit.append([i+1,j,'bot'])
+            if len(to_visit) == 0:
+                #current_cell.draw("black")
+                return
+            else:
+                random_direction = random.randrange(0,len(to_visit))
+                #chosen cell location
+                ccl = to_visit[random_direction]
+                chosen_cell = self._cells[ccl[0]][ccl[1]]
+                current_cell._break_wall(ccl[2],chosen_cell)
+                if self.win is not None:
+                    self._animate()
+                self._break_walls_r(ccl[0],ccl[1])
+                
+    def _reset_cells_visited(self):
+        for i in range(self.num_rows):
+            for cell in self._cells[i]:
+                cell._visited = False
+                

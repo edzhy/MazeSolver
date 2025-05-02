@@ -19,8 +19,7 @@ def main():
     #win.draw_cell(cell4, "black")
     #win.draw_cell_move(cell1, cell3)
     #win.draw_cell_move(cell4, cell3, True)
-    maze = Maze(10,10,30,30,30,30,win)
-    maze._break_entrance_and_exit()
+    maze = Maze(10,10,15,10,40,40,win,2)
     win.wait_for_close()
 
 main()
